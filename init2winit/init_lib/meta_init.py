@@ -178,6 +178,7 @@ def meta_optimize_scales(loss_fn,
   # The flax optimizer expects a Model object. There is no fprop for the
   # meta_model, hence the first argument is None.
   meta_model = nn.Model(None, norms)
+  # TODO(gilmer,znado): update to optax.
   meta_opt = optimizers.Momentum(hps.meta_learning_rate,
                                  hps.meta_momentum).create(
                                      meta_model, focus=traversal)
