@@ -24,6 +24,7 @@ from init2winit.dataset_lib import nqm_noise
 from init2winit.dataset_lib import proteins
 from init2winit.dataset_lib import small_image_datasets
 from init2winit.dataset_lib import translate_wmt
+from init2winit.dataset_lib import ogbg_molpcba
 
 _Dataset = collections.namedtuple('Dataset', ('getter', 'hparams', 'meta_data'))
 
@@ -70,6 +71,11 @@ _ALL_DATASETS = {
         _Dataset(nqm_noise.get_nqm_noise,
                  nqm_noise.NQM_HPARAMS,
                  nqm_noise.NQM_METADATA),
+    'ogbg_molpcba':
+        _Dataset(ogbg_molpcba.get_ogbg_molpcba,
+                 ogbg_molpcba.DEFAULT_HPARAMS,
+                 ogbg_molpcba.METADATA),
+
     'uniref50':
         _Dataset(proteins.get_uniref,
                  proteins.DEFAULT_HPARAMS,
@@ -89,8 +95,11 @@ def get_dataset_hparams(dataset_name):
   """Maps dataset name to default_hps."""
   try:
     hparams = _ALL_DATASETS[dataset_name].hparams
-    if hparams.input_shape is None:
-      if dataset_name == 'lm1b':
+
+    if 'input_shape' not in hparams or hparams.input_shape is None:
+      if 'input_edge_shape' in hparams and 'input_node_shape' in hparams:
+        pass
+      elif dataset_name == 'lm1b':
         max_len = max(hparams.max_target_length, hparams.max_eval_target_length)
         hparams.input_shape = (max_len,)
       elif dataset_name == 'translate_wmt':
